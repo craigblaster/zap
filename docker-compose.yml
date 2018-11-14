@@ -1,0 +1,51 @@
+influxdb:
+  image: influxdb:latest
+  container_name: influxdb
+  ports:
+    - "8083:8083"
+    - "8086:8086"
+    - "8090:8090"
+  env_file:
+    - 'env.influxdb'
+  volumes:
+    # Data persistency
+    # sudo mkdir -p /srv/docker/influxdb/data
+    - resin-data/influxdb:/var/lib/influxdb
+
+telegraf:
+  image: telegraf:latest
+  container_name: telegraf
+  links:
+    - influxdb
+  ports:
+    - "8092:8092/udp"
+    - "8094:8094"
+    - "8125:8125/udp"
+  volumes:
+    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+
+grafana:
+  image: grafana/grafana:latest
+  container_name: grafana
+  ports:
+    - "3000:3000"
+  env_file:
+    - 'env.grafana'
+  links:
+    - influxdb
+  command: bash
+  #volumes:
+    # Data persistency
+    # sudo mkdir -p /srv/docker/grafana/data; chown 472:472 /srv/docker/grafana/data
+    #- /srv/docker/grafana/data:/var/lib/grafana
+    
+      # Define a Chronograf service
+chronograf:
+  image: chronograf:1.3.8
+  environment:
+    INFLUXDB_URL: http://influxdb:8086
+  ports:
+    - "8888:8888"
+  links:
+    - influxdb
+
