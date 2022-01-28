@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "./readSerial.py", line 90, in <module>
+    res = fit_sin(t, values)
+  File "./readSerial.py", line 71, in fit_sin
+    popt, pcov = scipy.optimize.curve_fit(sinfunc, tt, yy, p0=guess)
+  File "/home/pi/.local/lib/python3.7/site-packages/scipy/optimize/minpack.py", line 794, in curve_fit
+    raise RuntimeError("Optimal parameters not found: " + errmsg)
+RuntimeError: Optimal parameters not found: Number of calls to function has reached maxfev = 1000.

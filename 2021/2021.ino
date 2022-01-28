@@ -23,13 +23,15 @@
 // to the pins used:
 const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
 const int analogOutPin = 9; // Analog output pin that the LED is attached to
+const int maxSamples = 1000;
 // Pin 13 has an LED connected on most Arduino boards.
 // give it a name:
 int led = 13;
+short wave [maxSamples]; //place to store a waveform
 
 
-int sensorValue = 0;        // value read from the pot
-int maxValue = 0;
+short sensorValue = 0;        // value read from the pot
+short maxValue = 0;
 unsigned long nowTime = 0;
 unsigned long lastTime = 0;
 int LEDValue = false;
@@ -38,47 +40,62 @@ long unsigned int total = 0;
 long unsigned int sampleCounter = 0;
 
 void setup() {
-  // initialize serial communications at 9600 bps:
+  // initialize serial communications at 14400 bps:
   Serial1.begin(14400); 
   Serial.begin(14400); 
   pinMode(led, OUTPUT);     
+  Serial1.println("average, rate, max value");   
 }
 
 void loop() {
   
   nowTime = millis();
-  sampleCounter++;
-
   // read the analog in value:
   sensorValue = analogRead(analogInPin);            
+  wave[sampleCounter] = sensorValue;
+
+  sampleCounter++;
   total += sensorValue;
   if(sensorValue > maxValue)
   {
     maxValue = sensorValue;
   }
 
-  if (nowTime > (lastTime + 1000))
+  if (sampleCounter > maxSamples)
   {
+    digitalWrite(led, LOW);
   
     // print the results to the serial monitor:
-    Serial1.print("average = " );                       
+    
+    //Serial1.print("average = " );    
     Serial1.print(total / sampleCounter);      
-    Serial1.print(", rate = " );                       
+    //Serial1.print(", rate = " );                       
+    Serial1.print(",");
     Serial1.print(sampleCounter);  
-    Serial1.print(", maxValue = " );                       
+    //Serial1.print(", maxValue = " );                       
+    Serial1.print(",");    
     Serial1.println(maxValue);   
     
-    if(LEDValue == 1)
+    for (unsigned int i=0;i<maxSamples;i++)
     {
-      LEDValue = 0;
-      digitalWrite(led, LOW);
+      Serial1.print(wave[i]);   
+      Serial1.print(",");    
     }
-    else
-    {
-      LEDValue = 1;
-      digitalWrite(led, HIGH);
-    }
-  
+    Serial1.println();
+    
+//    
+//    if(LEDValue == 1)
+//    {
+//      LEDValue = 0;
+//      digitalWrite(led, LOW);
+//    }
+//    else
+//    {
+//      LEDValue = 1;
+//      digitalWrite(led, HIGH);
+//    }
+//  
+    digitalWrite(led, HIGH);
     total=0;
     sampleCounter=0;  
     maxValue = 0;
